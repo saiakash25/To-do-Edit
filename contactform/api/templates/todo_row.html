@@ -1,0 +1,21 @@
+<div id="todo-{{ todo.id }}">
+
+    {{ todo.title }}
+
+    {% if todo.completed %}
+
+        <span>✅ Completed</span>
+
+    {% else %}
+
+        <button
+            hx-post="{% url 'complete-todo' todo.id %}"
+            hx-target="#todo-{{ todo.id }}"
+            hx-swap="outerHTML"
+        >
+            Complete
+        </button>
+
+    {% endif %}
+
+</div>

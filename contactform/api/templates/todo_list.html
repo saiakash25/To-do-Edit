@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Dashboard</title>
+</head>
+
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+<body>
+
+<h1>Dashboard</h1>
+
+<p>
+    Welcome {{ request.user.username }}
+</p>
+
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">
+        Logout
+    </button>
+</form>
+
+<hr>
+
+{% for message in messages %}
+    <p>{{ message }}</p>
+{% endfor %}
+
+<h2>Todo List</h2>
+
+{% if request.user.groups.all.0.name == "Manager" %}
+
+    <a href="{% url 'create-todo' %}">
+        Create Todo
+    </a>
+
+{% endif %}
+
+<hr>
+
+{% for todo in todos %}
+    <div id="todo-{{ todo.id }}">
+
+    {{ todo.title }}
+
+    
+    {% if not todo.completed %}
+
+<form
+    method="post"
+    action="{% url 'complete-todo' todo.id %}"
+>
+    {% csrf_token %}
+
+    <button type="submit">
+        Complete
+    </button>
+
+</form>
+
+{% else %}
+
+<p>✅ Completed</p>
+
+{% endif %}
+        <a href="{% url 'edit-todo' todo.id %}">
+            Edit
+        </a>
+    </p>
+
+{% empty %}
+
+    <p>No todos yet.</p>
+
+{% endfor %}
+</div
+
+</body>
+</html>
