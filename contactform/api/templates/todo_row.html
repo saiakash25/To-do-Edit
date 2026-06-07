@@ -1,3 +1,4 @@
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
 <div id="todo-{{ todo.id }}">
 
     {{ todo.title }}
@@ -8,14 +9,41 @@
 
     {% else %}
 
-        <button
-            hx-post="{% url 'complete-todo' todo.id %}"
-            hx-target="#todo-{{ todo.id }}"
-            hx-swap="outerHTML"
+       <form
+        style="display:inline;"
+        hx-post="{% url 'complete-todo' todo.id %}"
+        hx-target="#todo-{{ todo.id }}"
+        hx-swap="outerHTML"
         >
+        {% csrf_token %}
+
+        <button type="submit">
             Complete
         </button>
-
+    </form>
     {% endif %}
 
+    <button
+    hx-get="{% url 'edit-todo' todo.id %}"
+    hx-target="#todo-{{ todo.id }}"
+    hx-swap="outerHTML"
+>
+    Edit
+</button>
+
+<form
+    style="display:inline;"
+    hx-post="{% url 'delete-todo' todo.id %}"
+    hx-target="#todo-{{ todo.id }}"
+    hx-swap="outerHTML"
+>
+    {% csrf_token %}
+
+    <button type="submit"
+     onclick="return confirm('Delete task?')">
+        Delete
+        
+    </button>
+
+</form>
 </div>

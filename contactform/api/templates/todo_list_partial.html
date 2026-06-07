@@ -1,0 +1,9 @@
+{% for todo in todos %}
+
+    {% include "todo_row.html" %}
+
+{% empty %}
+
+    <p>No todos yet.</p>
+
+{% endfor %}

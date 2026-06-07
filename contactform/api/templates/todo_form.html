@@ -3,25 +3,18 @@
 <head>
     <title>Create Todo</title>
 </head>
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
 <body>
 
 <h1>Create Todo</h1>
 
-<form method="post">
-
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button type="submit">
-        Save
-    </button>
-
-</form>
-
-<a href="{% url 'todo-list' %}">
-    Back
-</a>
+<button
+hx-get="{% url 'create-todo' %}"
+hx-target="#create-form"
+hx-swap="innerHTML">Create Todo
+</button>
+<div id="create-form"></div>
 
 </body>
 </html>

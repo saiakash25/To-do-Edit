@@ -1,6 +1,8 @@
+from urllib import response
+
 from django.contrib import messages
 
-from django.http import HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 
@@ -89,16 +91,28 @@ def create_todo(request):
 
             todo.save()
 
-            return redirect("todo-list")
+            response = render(
+                request,
+                "todo_row.html",
+                {
+                    "todo": todo
+                }
+            )
+
+            response["HX-Trigger"] = "todoCreated"
+
+            return response
 
     else:
 
         form = TodoForm()
 
     return render(
-        request,
-        "todo_form.html",
-        {"form": form}
+    request,
+    "todo_create_form.html",
+    {
+        "form": form
+    }
     )
 
 from django.shortcuts import (
@@ -133,10 +147,23 @@ def edit_todo(request, id):
 
         if form.is_valid():
 
-            form.save()
+            todo = form.save()
 
-            return redirect(
-                "todo-list"
+            can_view = (
+                todo.assigned_to == request.user
+                or
+                todo.created_by == request.user
+            )
+
+            if not can_view:
+                return HttpResponse("")
+
+            return render(
+                request,
+                "todo_row.html",
+                {
+                    "todo": todo
+                }
             )
 
     else:
@@ -145,10 +172,32 @@ def edit_todo(request, id):
             instance=todo
         )
 
+    
+
     return render(
         request,
-        "todo_form.html",
-        {"form": form}
+        "todo_edit_form.html",
+        {
+            "todo": todo,
+            "form": form,
+        }
+    )
+
+@login_required
+def search_todos(request):
+
+    q = request.GET.get("q", "")
+
+    todos = Todo.objects.filter(
+        title__icontains=q
+    )
+
+    return render(
+        request,
+        "todo_list_partial.html",
+        {
+            "todos": todos
+        }
     )
 
 @login_required
@@ -167,5 +216,48 @@ def complete_todo(request, id):
 
     todo.save()
 
-    return redirect("todo-list")
+    return render(
+        request,
+        "todo_row.html",
+        {"todo": todo}
+    )
 
+@login_required
+def delete_todo(request, id):
+
+    todo = get_object_or_404(
+        Todo,
+        pk=id
+    )
+
+    if (
+        todo.assigned_to != request.user
+        and
+        todo.created_by != request.user
+    ):
+        return HttpResponseForbidden()
+
+    todo.delete()
+
+    return HttpResponse("")
+
+@login_required
+def todo_list_partial(request):
+
+    if request.user.groups.filter(
+        name="Manager"
+    ).exists():
+
+        todos = request.user.created_todos.all()
+
+    else:
+
+        todos = request.user.assigned_todos.all()
+
+    return render(
+        request,
+        "todo_list_partial.html",
+        {
+            "todos": todos
+        }
+    )

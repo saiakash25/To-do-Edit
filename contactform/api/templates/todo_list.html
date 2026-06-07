@@ -28,53 +28,59 @@
 
 <h2>Todo List</h2>
 
+<input
+    type="text"
+    name="q"
+    placeholder="Search Todos"
+
+    hx-get="{% url 'search-todos' %}"
+    hx-trigger="keyup changed delay:500ms"
+    hx-target="#todo-list"
+>
+
 {% if request.user.groups.all.0.name == "Manager" %}
 
-    <a href="{% url 'create-todo' %}">
-        Create Todo
-    </a>
+   <button
+    hx-get="{% url 'create-todo' %}"
+    hx-target="#create-form"
+   
+>
+    Create Todo
+</button>
+
+<div id="create-form"></div>
+
+<hr>
 
 {% endif %}
 
 <hr>
+<div id="todo-list">
 
-{% for todo in todos %}
-    <div id="todo-{{ todo.id }}">
+    {% for todo in todos %}
+        {% include "todo_row.html" %}
 
-    {{ todo.title }}
+        {% empty %}
+            <p>No todos yet.</p>
+    {% endfor %}
 
-    
-    {% if not todo.completed %}
-
-<form
-    method="post"
-    action="{% url 'complete-todo' todo.id %}"
->
-    {% csrf_token %}
-
-    <button type="submit">
-        Complete
-    </button>
-
-</form>
-
-{% else %}
-
-<p>✅ Completed</p>
-
-{% endif %}
-        <a href="{% url 'edit-todo' todo.id %}">
-            Edit
-        </a>
-    </p>
-
-{% empty %}
-
-
-    <p>No todos yet.</p>
-
-{% endfor %}
 </div>
 
 </body>
+
+<script>
+
+document.body.addEventListener(
+    "todoCreated",
+    function () {
+
+        document.getElementById(
+            "create-form"
+        ).innerHTML = "";
+
+    }
+);
+
+</script>
+
 </html>

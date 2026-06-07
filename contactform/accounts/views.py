@@ -27,8 +27,8 @@ def register_view(request):
             )
             
 
-            return HttpResponse("User Created")
-            #return redirect("login")
+            #return HttpResponse("User Created")
+            return redirect("login")
 
     else:
 
