@@ -98,7 +98,7 @@ def create_todo(request):
                     "todo": todo
                 }
             )
-
+            response["HX-Trigger"] = "todo-created"
             response["HX-Trigger"] = "todoCreated"
 
             return response

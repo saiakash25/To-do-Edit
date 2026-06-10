@@ -31,19 +31,35 @@
     Edit
 </button>
 
-<form
-    style="display:inline;"
-    hx-post="{% url 'delete-todo' todo.id %}"
-    hx-target="#todo-{{ todo.id }}"
-    hx-swap="outerHTML"
->
-    {% csrf_token %}
+<div x-data="{ open: false }" style="display:inline;">
 
-    <button type="submit"
-     onclick="return confirm('Delete task?')">
+    <button @click="open = true">
         Delete
-        
     </button>
 
-</form>
+    <div
+        x-show="open"
+        @click.outside="open = false"
+    >
+        <p>Delete task?</p>
+
+        <button @click="open = false">
+            Cancel
+        </button>
+
+        <form
+            hx-post="{% url 'delete-todo' todo.id %}"
+            hx-target="#todo-{{ todo.id }}"
+            hx-swap="outerHTML"
+        >
+            {% csrf_token %}
+
+            <button type="submit">
+                Confirm Delete
+            </button>
+        </form>
+
+    </div>
+
+</div>
 </div>

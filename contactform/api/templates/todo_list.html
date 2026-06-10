@@ -4,6 +4,8 @@
     <title>Task Dashboard</title>
 </head>
 
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 <body>
 
@@ -37,18 +39,38 @@
     hx-trigger="keyup changed delay:500ms"
     hx-target="#todo-list"
 >
-
+<br>
+<div x-data="{ open: false }">
 {% if request.user.groups.all.0.name == "Manager" %}
 
-   <button
+    <button
+    @click="open = !open"
     hx-get="{% url 'create-todo' %}"
     hx-target="#create-form"
-   
->
+   >
     Create Todo
 </button>
-
+<div
+        x-show="open"
+    >
 <div id="create-form"></div>
+</div>
+</div>
+
+<div
+    x-data="{ showToast: false }"
+
+    @todo-created.window="
+        showToast = true
+
+        setTimeout(
+            () => showToast = false,
+            3000
+        )">
+    <div x-show="showToast">
+        Todo Created Successfully
+    </div>
+</div>
 
 <hr>
 
@@ -74,6 +96,7 @@ document.body.addEventListener(
     "todoCreated",
     function () {
 
+        console.log('todoCreated fired')
         document.getElementById(
             "create-form"
         ).innerHTML = "";
