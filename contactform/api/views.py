@@ -199,7 +199,7 @@ def search_todos(request):
             "todos": todos
         }
     )
-
+#akash
 @login_required
 def complete_todo(request, id):
 
